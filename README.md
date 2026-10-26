@@ -32,12 +32,15 @@ Updating keeps your saved patches, sequencer patterns, MIDI channel and tuning.
 
 ## Releasing an update
 
-1. In Arduino IDE: **Sketch → Export Compiled Binary**
-2. Rename the three exported files to `bootloader.bin`, `partitions.bin`, `firmware.bin`
-3. Drag them into this repo, overwriting the existing files
-4. Add a new line at the **top** of `changelog.txt`, e.g. `1.5 - what changed`
+1. Upload the new sketch into the `sketch` folder (delete the old .ino so there is only one)
+2. Add a new line at the **top** of `changelog.txt`, e.g. `1.5 - what changed`
+3. Commit
 
-That's all: the version, What's New list and installer update themselves.
+GitHub compiles the sketch (ESP32 core 2.0.17, ESP32 Dev Module) and republishes the page in about 3-5 minutes.
+Watch it on the **Actions** tab: a green tick means the new firmware is live. A red cross means the build failed
+and the page keeps the previous version - click it to see the error.
+
+New manuals: upload them with the same file names and commit. The page republishes automatically.
 
 ## Hardware
 
