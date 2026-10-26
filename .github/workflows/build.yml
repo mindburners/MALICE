@@ -1,0 +1,101 @@
+# Mindburner: compile the sketch and publish the installer page on every upload.
+#
+# How to release:  put the new .ino in the "sketch" folder (delete the old one),
+#                  add a line at the top of changelog.txt, commit. That's it.
+#
+# Settings > Pages > Source must be set to "GitHub Actions" (one-off).
+
+name: Build and publish
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:          # "Run workflow" button on the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  ESP32_CORE: "2.0.17"                 # ESP32 Arduino core 2.x (timerBegin/timerAlarmWrite API)
+  FQBN: "esp32:esp32:esp32"            # ESP32 Dev Module, default settings
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the files
+        uses: actions/checkout@v4
+
+      - name: Find the sketch
+        id: sketch
+        run: |
+          INO=$(ls sketch/*.ino 2>/dev/null | head -n 1 || true)
+          if [ -z "$INO" ]; then
+            echo "No sketch in the sketch folder - publishing the .bin files already in the repo."
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Sketch: $INO"
+            echo "found=true"  >> "$GITHUB_OUTPUT"
+            echo "ino=$INO"    >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Arduino CLI
+        if: steps.sketch.outputs.found == 'true'
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP32 core and libraries
+        if: steps.sketch.outputs.found == 'true'
+        run: |
+          arduino-cli config init --overwrite
+          arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@${ESP32_CORE}
+          arduino-cli lib install "Adafruit GFX Library" "Adafruit ST7735 and ST7789 Library" "Adafruit BusIO"
+          # Extra libraries for this product: one name per line in sketch/libraries.txt
+          if [ -f sketch/libraries.txt ]; then
+            while IFS= read -r lib; do
+              [ -n "$lib" ] && arduino-cli lib install "$lib"
+            done < sketch/libraries.txt
+          fi
+
+      - name: Compile
+        if: steps.sketch.outputs.found == 'true'
+        run: |
+          INO="${{ steps.sketch.outputs.ino }}"
+          NAME=$(basename "$INO" .ino)
+          mkdir -p "build/$NAME"
+          cp sketch/* "build/$NAME/"            # the sketch plus any .h files next to it
+          arduino-cli compile --fqbn "$FQBN" --export-binaries "build/$NAME"
+          OUT=$(ls -d build/$NAME/build/*/)
+          cp "$OUT/$NAME.ino.bootloader.bin" bootloader.bin
+          cp "$OUT/$NAME.ino.partitions.bin" partitions.bin
+          cp "$OUT/$NAME.ino.bin"            firmware.bin
+          ls -l bootloader.bin partitions.bin firmware.bin
+
+      - name: Collect the web page files
+        run: |
+          mkdir -p _site
+          cp -r *.html *.json *.txt *.png *.pdf *.bin _site/ 2>/dev/null || true
+          ls -l _site
+
+      - name: Upload the page
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
