@@ -24,7 +24,8 @@ Updating keeps your saved patches, sequencer patterns, MIDI channel and tuning.
 | File | Purpose |
 |---|---|
 | `index.html` | The installer page |
-| `manifest.json` | Tells the installer where each firmware part goes in flash, and the version shown on the page |
+| `changelog.txt` | Version history, newest first. The page reads its version and What's New list from here |
+| `manifest.json` | Backup installer manifest (the page builds its own from `changelog.txt`) |
 | `bootloader.bin`, `partitions.bin`, `firmware.bin` | The compiled firmware |
 | `logo.png` | Branding shown on the installer page |
 | `*.pdf` | User manual and quick start guide |
@@ -34,7 +35,9 @@ Updating keeps your saved patches, sequencer patterns, MIDI channel and tuning.
 1. In Arduino IDE: **Sketch → Export Compiled Binary**
 2. Rename the three exported files to `bootloader.bin`, `partitions.bin`, `firmware.bin`
 3. Drag them into this repo, overwriting the existing files
-4. Update `version` in `manifest.json` and add a line to the "What's New" list in `index.html`
+4. Add a new line at the **top** of `changelog.txt`, e.g. `1.5 - what changed`
+
+That's all: the version, What's New list and installer update themselves.
 
 ## Hardware
 
