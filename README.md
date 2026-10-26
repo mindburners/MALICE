@@ -16,8 +16,8 @@ Updating keeps your saved patches, sequencer patterns, MIDI channel and tuning.
 
 ## Documentation
 
-- [User manual v1.4 (PDF)](MALICE_User_Manual_v1.4.pdf)
-- [Quick start guide v1.4 (PDF)](MALICE_Quick_Start_v1.4.pdf)
+- [User manual (PDF)](MALICE_User_Manual.pdf)
+- [Quick start guide (PDF)](MALICE_Quick_Start.pdf)
 
 ## What's in this repo
 
