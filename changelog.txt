@@ -1,4 +1,4 @@
-1.4 - POLI LP / POLI BP filters (Polivoks-style), X-Mod and Sync, 2-slot mod matrix with aftertouch, chorus speed, 30 patch memories with 10 new factory sounds, A+B+C factory restore
+1.4 - POLI LP / POLI BP filters (Polivoks-style), X-Mod and Sync, 2-slot mod matrix with aftertouch, chorus speed, 40 patch memories, A+B+C factory restore
 1.3 - Step sequencer (accent, slide, 8 patterns, chain, recording, MIDI clock), tempo-synced LFO and delay, master tune
 1.2 - Noise types: white, pink, brown, digital
 1.1 - NOISE page, 20 patch memories, engine about twice as fast
