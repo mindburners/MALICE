@@ -172,5 +172,24 @@
     }
     window.addEventListener('load', setup);
   </script>
+
+  <!-- Visit and install counter (GoatCounter: no cookies, no personal data) -->
+  <script data-goatcounter="https://mindburner.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+  <script>
+    // Counts one "installed" event when the web installer finishes flashing
+    (function () {
+      var PRODUCT = 'MALICE', counted = false;
+      setInterval(function () {
+        var d = document.querySelector('ewt-install-dialog');
+        if (!d) { counted = false; return; }
+        var s = d._installState;
+        if (s && s.state === 'finished' && !counted && window.goatcounter && goatcounter.count) {
+          counted = true;
+          goatcounter.count({ path: 'install-' + PRODUCT, title: PRODUCT + ' firmware installed', event: true });
+        }
+      }, 500);
+    })();
+  </script>
 </body>
 </html>
